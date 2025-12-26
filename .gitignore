@@ -1,0 +1,39 @@
+# --- AI/ML Specific ---
+# Don't upload the actual model weights (they are too large for Git)
+*.h5
+*.keras
+*.tflite
+*.pb
+*.onnx
+
+# Don't upload the dataset folders
+data/
+garbage_classification/
+dataset/
+
+# --- Python & Environment ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+bin/
+lib/
+
+# --- Streamlit ---
+.streamlit/config.toml
+# If you use streamlit secrets
+.streamlit/secrets.toml
+
+# --- Operating System ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs & Performance ---
+.ipynb_checkpoints
+.pytest_cache/
+logs/
+*.log
