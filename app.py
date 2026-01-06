@@ -45,29 +45,70 @@ class_names = [
     'plastic', 'shoes', 'trash', 'white-glass'
 ]
 
-# --- UI CODE ---
 # --- UI Configuration ---
-st.set_page_config(page_title="RecycleVision AI", page_icon="♻️", layout="wide") # 'wide' uses the full screen width
+# --- UI Configuration (The Designer's Touch) ---
+st.set_page_config(
+    page_title="RecycleVision Core | Founder Edition", 
+    page_icon="♻️", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.title("♻️ RecycleVision: AI Waste Classifier")
-st.write("Dignifying waste management through high-speed AI sorting.")
+# Custom CSS for a clean, professional aesthetic
+st.markdown("""
+    <style>
+    .main {
+        background-color: #f8f9fa;
+    }
+    .stMetric {
+        background-color: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    div.stButton > button:first-child {
+        background-color: #2e7d32;
+        color: white;
+        border-radius: 5px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Create two columns
-col1, col2 = st.columns([1, 1]) # Equal width columns
+# --- Sidebar: The Founder's Mission ---
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/3299/3299935.png", width=80)
+    st.title("RecycleVision")
+    st.markdown("---")
+    st.subheader("🌟 Founder's Vision")
+    st.info(f"**Nirmal Kumar Bhagatkar**\n\n'My goal is to solve world problems to minimize workload from human races and dignify all living creatures.'")
+    st.markdown("---")
+    st.write("📊 **System Status:** Operational")
+    st.write("🌍 **Impact:** Global Waste Reduction")
+
+# --- Main Dashboard ---
+st.title("♻️ RecycleVision AI Core")
+st.caption("Advanced Computer Vision Engine for Autonomous Waste Classification")
+
+# Main Layout
+col1, col2 = st.columns([1.2, 1], gap="large")
 
 with col1:
-    st.subheader("1. Input")
-    uploaded_file = st.file_uploader("Upload waste image...", type=["jpg", "png", "jpeg"])
-    
-    if uploaded_file:
-        image = Image.open(uploaded_file).convert('RGB')
-        # Resize image purely for UI display so it doesn't take up the whole screen
-        st.image(image, caption='Uploaded Image', use_container_width=True)
+    st.markdown("### 📥 Input Stream")
+    with st.container(border=True):
+        uploaded_file = st.file_uploader("Drop waste imagery here...", type=["jpg", "png", "jpeg"])
+        
+        if uploaded_file:
+            image = Image.open(uploaded_file).convert('RGB')
+            st.image(image, caption='High-Resolution Input Scan', use_container_width=True)
+        else:
+            # A placeholder image or illustration to guide the user
+            st.info("Awaiting visual input for environmental analysis.")
 
 with col2:
-    st.subheader("2. AI Analysis")
+    st.markdown("### 🧠 AI Neural Analysis")
+    
     if uploaded_file and model is not None:
-        with st.spinner('Analyzing...'):
+        with st.spinner('Accessing Neural Weights...'):
             # Preprocessing
             img = image.resize((224, 224))
             img_array = tf.keras.preprocessing.image.img_to_array(img) / 255.0
@@ -79,29 +120,47 @@ with col2:
             result = class_names[result_index]
             confidence = predictions[0][result_index] * 100
 
-        # Display results in the second column
-        st.success(f"**Classification:** {result.upper()}")
-        
-        # Compact Metrics
-        st.metric(label="Confidence Score", value=f"{confidence:.2f}%")
-        st.progress(min(int(confidence), 100))
+        # --- Visual Result Card ---
+        with st.container(border=True):
+            # Dynamic Icon based on result
+            status_color = "#2e7d32" if confidence > 80 else "#f9a825"
+            
+            st.markdown(f"<h1 style='text-align: center; color: {status_color};'>{result.upper()}</h1>", unsafe_allow_html=True)
+            
+            # Metric Dashboard
+            m1, m2 = st.columns(2)
+            m1.metric("Classification", result.capitalize())
+            m2.metric("AI Confidence", f"{confidence:.1f}%")
+            
+            st.progress(min(int(confidence), 100))
+            
+            st.markdown("---")
+            
+            # Intelligent Disposal Logic
+            if result in ['battery', 'metal']:
+                st.error("🚨 **ACTION REQUIRED:** HAZARDOUS/SPECIAL DISPOSAL")
+                st.write("This item contains materials that require specialized industrial processing to prevent environmental damage.")
+            elif result in ['paper', 'cardboard', 'plastic', 'glass', 'brown-glass', 'white-glass']:
+                st.success("✅ **RECYCLABLE:** CIRCULAR ECONOMY ELIGIBLE")
+                st.write("This item can be processed and reintroduced into the supply chain. Place in the blue collection bin.")
+            elif result == 'biological':
+                st.warning("🍃 **COMPOSTABLE:** ORGANIC RECOVERY")
+                st.write("Natural material. Suitable for composting to restore soil dignity and nutrients.")
+            else:
+                st.info("🗑️ **GENERAL WASTE:** LANDFILL DESTINATION")
+                st.write("Currently not recyclable via standard vision protocols. Place in general refuse.")
 
-        # Actionable Advice
-        if result in ['battery', 'metal']:
-            st.warning("⚠️ **Special Disposal:** Take to a specialized center.")
-        elif result in ['paper', 'cardboard', 'plastic', 'glass', 'brown-glass', 'white-glass']:
-            st.info("♻️ **Recyclable:** Blue Bin.")
-        elif result == 'biological':
-            st.info("🍃 **Compostable:** Organic Waste.")
-        else:
-            st.error("🗑️ **General Trash:** Standard Bin.")
     else:
-        st.info("Waiting for image upload...")
+        # Professional Dashboard Placeholder
+        st.write("Please upload an image to begin the classification sequence.")
+        st.divider()
+        st.image("https://img.freepik.com/free-vector/robotic-arm-sorting-garbage-conveyor-belt_107791-17154.jpg?t=st=1720000000&exp=1720003600&hmac=placeholder", use_container_width=True)
 
-    # Business Logic
-    if result in ['battery', 'metal']:
-        st.warning("⚠️ Special Disposal required.")
-    elif result in ['paper', 'cardboard', 'plastic', 'glass', 'brown-glass', 'white-glass']:
-        st.success("♻️ Recyclable.")
-    else:
-        st.error("🗑️ General Waste.")
+# --- Footer ---
+st.markdown("---")
+st.markdown(
+    "<div style='text-align: center; color: #7f8c8d;'>"
+    "RecycleVision Core V2.0 | Built with precision to dignify every living creature."
+    "</div>", 
+    unsafe_allow_html=True
+)

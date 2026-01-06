@@ -4,6 +4,8 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 import matplotlib.pyplot as plt
 from data_loader import get_data_generators
 from model import build_transfer_model
+from sklearn.utils import class_weight
+import numpy as np
 
 def train_and_evaluate(data_path):
     train_gen, val_gen = get_data_generators(data_path)
@@ -14,9 +16,22 @@ def train_and_evaluate(data_path):
     for name in model_names:
         print(f"\n--- Training {name} ---")
         model = build_transfer_model(model_type=name, num_classes=len(train_gen.class_indices))
+
+# Calculate weights based on the training data
+        weights = class_weight.compute_class_weight(
+            class_weight='balanced',
+            classes=np.unique(train_gen.classes),
+            y=train_gen.classes
+            )
+        class_weights = dict(enumerate(weights))
+        early_stop = tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss', 
+            patience=3, 
+            restore_best_weights=True
+        )
         
         # Train
-        model.fit(train_gen, validation_data=val_gen, epochs=10)
+        model.fit(train_gen, validation_data=val_gen, epochs=15, class_weight=class_weights,callbacks=[early_stop])
         
         # Evaluate: Predictions for Confusion Matrix
         val_gen.reset()
