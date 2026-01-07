@@ -6,7 +6,7 @@ import os
 
 @st.cache_resource
 def load_recycle_model():
-    model_path = 'recycle_vision_best.h5'
+    model_path = 'models/recycle_vision_EfficientNet_FIXED.h5'
     if not os.path.exists(model_path):
         st.error(f"Model file not found: {model_path}")
         return None
